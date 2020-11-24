@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TextArea id="eventotab" fx:id="eventInfoTab" editable="false" layoutY="32.0" minHeight="170.0" minWidth="200.0" prefHeight="170.0" prefWidth="200.0" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="30.0" />
+      <Button fx:id="menuBtn" layoutX="238.0" layoutY="14.0" mnemonicParsing="false" onAction="#buttonActionRecipeBook" text="Menu" AnchorPane.topAnchor="14.0" />
+      <Button fx:id="addMIbtn" layoutX="229.0" layoutY="49.0" mnemonicParsing="false" onAction="#buttonActionAddMenuItem" text="Aggiungi" AnchorPane.topAnchor="50.0" />
+      <TableView fx:id="taskTab" layoutX="113.0" layoutY="229.0" minHeight="200.0" minWidth="490.0" prefHeight="200.0" prefWidth="490.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="110.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="200.0">
+        <columns>
+          <TableColumn fx:id="col_cook" prefWidth="135.0" text="Cuoco" />
+          <TableColumn fx:id="col_shift" prefWidth="70.0" text="Turno" />
+            <TableColumn fx:id="col_task" prefWidth="285.0" text="Compito" />
+        </columns>
+      </TableView>
+      <Button fx:id="addTaskbtn" layoutX="75.0" layoutY="226.0" mnemonicParsing="false" onAction="#buttonActionAddTask" text="+" AnchorPane.leftAnchor="75.0" AnchorPane.topAnchor="226.0" />
+      <Label layoutX="14.0" layoutY="219.0" prefHeight="40.0" prefWidth="63.0" text="Aggiungi Compito" wrapText="true" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="219.0" />
+      <Button fx:id="removeMIbtn" layoutX="232.0" layoutY="88.0" mnemonicParsing="false" onAction="#buttonActionRemoveMenuIt" text="Rimuovi" AnchorPane.topAnchor="88.0" />
+      <ListView id="menutab" fx:id="menuInfoTab" editable="true" layoutX="300.0" minHeight="200.0" minWidth="300.0" prefHeight="200.0" prefWidth="300.0" AnchorPane.leftAnchor="300.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <Label layoutX="14.0" layoutY="267.0" prefHeight="40.0" prefWidth="63.0" text="Rimuovi Compito" wrapText="true" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="267.0" />
+      <Button fx:id="rmvTaskbtn" layoutX="77.0" layoutY="275.0" mnemonicParsing="false" onAction="#buttonActionRemoveTask" text="-" AnchorPane.leftAnchor="77.0" AnchorPane.topAnchor="275.0" />
+      <Button fx:id="tabellonebtn" layoutX="8.0" layoutY="361.0" mnemonicParsing="false" onAction="#buttonActionOpenTaskTable" text="Apri Tabellone" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="8.0" />
+      <Label layoutX="8.0" layoutY="321.0" prefHeight="40.0" prefWidth="75.0" text="Tabellone dei Turni" textAlignment="RIGHT" wrapText="true" AnchorPane.bottomAnchor="39.0" AnchorPane.leftAnchor="14.0" />
+      <Button fx:id="neweventbtn" layoutX="141.0" layoutY="2.0" mnemonicParsing="false" onAction="#buttonActionNewEvent" text="New Event" AnchorPane.leftAnchor="141.0" AnchorPane.topAnchor="2.0" />
+      <MenuButton fx:id="eventmenu" layoutX="5.0" layoutY="2.0" minHeight="25.0" minWidth="125.0" mnemonicParsing="false" onAction="#selectMouseClick" prefHeight="25.0" prefWidth="125.0" text="Select Event or" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="2.0">
+        <items>
+          <!--MenuItem mnemonicParsing="false" text="Action 1" />
+          <MenuItem mnemonicParsing="false" text="Action 2" / -->
+        </items>
+      </MenuButton>
+   </children>
+</AnchorPane>

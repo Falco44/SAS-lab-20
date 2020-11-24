@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="RecipeBookController">
+   <children>
+      <TableView fx:id="tableView" layoutX="81.0" layoutY="62.0" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="-0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <columns>
+          <TableColumn fx:id="rec_col" minWidth="155.0" prefWidth="155.0" text="Ricetta" />
+          <TableColumn fx:id="owner_col" minWidth="125.0" prefWidth="125.0" text="Proprietario" />
+            <TableColumn fx:id="descr_col" minWidth="78.0" prefWidth="270.0" text="Descrizione" />
+            <TableColumn fx:id="add_col" minWidth="50.0" prefWidth="50.0" text="Add" />
+        </columns>
+      </TableView>
+   </children>
+</AnchorPane>
