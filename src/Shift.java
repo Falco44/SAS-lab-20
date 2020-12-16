@@ -1,4 +1,6 @@
-public class Shift {
+import java.io.Serializable;
+
+public class Shift implements Serializable {
     private final int startH;
     private final int endH;
 

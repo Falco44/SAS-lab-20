@@ -15,6 +15,10 @@ public class MyMenuItem implements Serializable {
         this.qty = qty;
     }
 
+    public void setQty(int q){
+        this.qty = q;
+    }
+
     public MyMenuItem getMI(String s){
         return this.recipe.getName().equals(s) ? this : null;
     }

@@ -18,6 +18,7 @@ public class RecipeBookController extends AbstractController implements Initiali
     private Stage stage;
     private File bookFile = null;
     private String move;
+    private final Controller contr;
 
     @FXML
     private TableView<Recipe> tableView;
@@ -30,7 +31,9 @@ public class RecipeBookController extends AbstractController implements Initiali
     @FXML
     private TableColumn<Recipe, Button> add_col;
 
-
+    public RecipeBookController(Controller c){
+        this.contr = c;
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -38,11 +41,12 @@ public class RecipeBookController extends AbstractController implements Initiali
         rec_col.setCellValueFactory(new PropertyValueFactory<>("name"));
         owner_col.setCellValueFactory(new PropertyValueFactory<>("owner"));
         descr_col.setCellValueFactory(new PropertyValueFactory<>("description"));
-        add_col.setCellFactory(ActionButtonTableCell.<Recipe>forTableColumn("Add",
+        add_col.setCellFactory(ActionButtonTableCell.forTableColumn("Add",
                 (r -> {int pos = tableView.getItems().indexOf(r);
                         Recipe rec = tableView.getItems().get(pos);
                         //scrivo append in event1/menu.txt
                         System.out.println("scrivero' su file "+rec);
+                        contr.writeMenuItem(rec);
                         return rec;
                 })));
         bookFile = new File("data/recipe_book.dat");
@@ -55,7 +59,13 @@ public class RecipeBookController extends AbstractController implements Initiali
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            initBook(outStream);
+            contr.initBook(outStream);
+            assert outStream != null;
+            try {
+                outStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         try {
@@ -64,15 +74,15 @@ public class RecipeBookController extends AbstractController implements Initiali
             e.printStackTrace();
         }
 
-        ArrayList<Recipe> arr = new ArrayList<>(readFile(inStream));
+        ArrayList<Recipe> arr = new ArrayList<>(contr.readBook(inStream));
         ObservableList<Recipe> obs = FXCollections.observableArrayList(arr);
         tableView.setItems(obs);
 
     }
 
-    private void initBook(ObjectOutputStream outs) {
+    /*private void initBook(ObjectOutputStream outs) {
         //bookFile = new File("data/recipe_book.dat");
-        User ciccio = new User("Ciccio", true/*cook*/, false/*chef*/, false/*org*/, false/*srv*/);
+        //User ciccio = new User("Ciccio", true, false, false, false);//nome, cook, chef, org, srv
         User aldo = new User("Aldo", true,false,false,false);
         User giulio = new User("Giulio", false,true,false,false);
         User carlo = new User("Carlo", true,false,false,false);
@@ -86,9 +96,9 @@ public class RecipeBookController extends AbstractController implements Initiali
         writeFile(outs, new Recipe("pizzette", aldo, "pizza margherita, ma piccola"));
         writeFile(outs, new Recipe("salatini", carlo, "sfoglia, ripiena a piacere tagliata a finger food"));
         System.out.println("FINE");
-    }
+    }*/
 
-    private void writeFile(ObjectOutputStream outs, Recipe recipe) {
+    /*private void writeFile(ObjectOutputStream outs, Recipe recipe) {
         try {
 
             outs.writeObject(recipe);
@@ -97,9 +107,9 @@ public class RecipeBookController extends AbstractController implements Initiali
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
-    private ArrayList<Recipe> readFile(ObjectInputStream ins){
+    /*private ArrayList<Recipe> readFile(ObjectInputStream ins){
         ArrayList<Recipe> tempRecList = new ArrayList<>();
         Object o;
 
@@ -118,7 +128,7 @@ public class RecipeBookController extends AbstractController implements Initiali
             e.printStackTrace();
         }
         return tempRecList;
-    }
+    }*/
 
     public void setStage(Stage stage) {
         this.stage = stage;

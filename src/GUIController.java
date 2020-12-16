@@ -1,22 +1,20 @@
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.util.StringConverter;
 
-import java.io.*;
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class GUIController extends AbstractController implements Initializable {
     private final Controller controller;
@@ -25,15 +23,15 @@ public class GUIController extends AbstractController implements Initializable {
         this.controller = c;
     }
 
-    private String moveFrom = null;
-    private String moveTo = null;
+    /*private String moveFrom = null;
+    private String moveTo = null;*/
 
     @FXML
     private TextArea eventInfoTab;
     @FXML
     private Button menuBtn;
     @FXML
-    private Button addMIbtn;
+    private Button editMIbtn;
     @FXML
     private TableView<MyTask> taskTab;
     @FXML
@@ -47,63 +45,119 @@ public class GUIController extends AbstractController implements Initializable {
     @FXML
     private Button removeMIbtn;
     @FXML
-    private ListView<String> menuInfoTab;
+    private ListView<MyMenuItem> menuInfoTab;
     @FXML
     private Button rmvTaskbtn;
     @FXML
     private Button tabellonebtn;
     @FXML
-    private Button neweventbtn;
+    private Button addnotebtn;
+    @FXML
+    private TextArea addnotetab;
     @FXML
     private MenuButton eventmenu;
+    @FXML
+    private TextField editMI;
+    @FXML
+    private TableView<MyTask> addtaskpane;
+    @FXML
+    private TableColumn<MyTask, User> add_cook_col;
+    @FXML
+    private TableColumn<MyTask, Shift> add_shift_col;
+    @FXML
+    private TableColumn<MyTask, String> add_task_col;
 
-    public void buttonActionRecipeBook(ActionEvent e) {
+    private File currentEvent;
+
+    public void buttonActionRecipeBook(ActionEvent e) throws Exception {
         System.out.println("ricettario");
-        openRecipeBook();
+        controller.openRecipeBook();
     }
 
-    private void openRecipeBook(){
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("guiRecipeBook.fxml"));
-        // initializing the controller
-        //RecipeBookController popupController = new RecipeBookController();
-        //loader.setController(popupController);
+    /*private void openRecipeBook() throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("guiRecipeBook.fxml"));
+        RecipeBookController rbc = new RecipeBookController(controller);
+        loader.setController(rbc);
         Parent layout;
-        try {
-            layout = loader.load();
-            Scene scene = new Scene(layout);
-            // this is the popup stage
-            Stage popupStage = new Stage();
-            // Giving the popup controller access to the popup stage (to allow the controller to close the stage)
-            //popupController.setStage(popupStage);
-            if(this.main!=null) {
-                popupStage.initOwner(main.getPrimaryStage());
-            }
-            popupStage.initModality(Modality.WINDOW_MODAL);
-            popupStage.setScene(scene);
-            popupStage.showAndWait();
-        } catch (IOException e) {
+        //try {
+        layout = loader.load();
+        Scene scene = new Scene(layout);
+        // this is the popup stage
+        Stage popupStage = new Stage();
+        // Giving the popup controller access to the popup stage (to allow the controller to close the stage)
+        //rbc.setStage(popupStage);//?
+        if(this.main!=null)
+            popupStage.initOwner(main.getPrimaryStage());
+        popupStage.initModality(Modality.WINDOW_MODAL);
+        popupStage.setTitle("Recipe Book");
+        popupStage.setScene(scene);
+        popupStage.showAndWait();
+        /*} catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
-    public void buttonActionAddMenuItem(ActionEvent e) { //da spostare nel recipebook
-        System.out.println("add R");
+    public void buttonActionEditMenuItem(ActionEvent e) {
+        System.out.println("edit R");
+        if(editMIbtn.getText().equals("Modifica")) {
+            editMI.setVisible(true);
+            editMIbtn.setText("Salva");
+        } else if (editMIbtn.getText().equals("Salva")){
+            MyMenuItem item = menuInfoTab.getSelectionModel().selectedItemProperty().getValue();
+            String s = editMI.getText();
+            MyMenuItem mi = controller.editMI(item, s);
+            int i = menuInfoTab.getItems().indexOf(item);
+            menuInfoTab.getItems().remove(item); //raw update view
+            menuInfoTab.getItems().add(i, mi); //raw update view
+            //update by file??
+            editMIbtn.setText("Modifica");
+            editMI.clear();
+            editMI.setVisible(false);
+        }
     }
 
     public void buttonActionAddTask(ActionEvent e) {
         System.out.println("add compito");
+        if(addTaskbtn.getText().equals("+")) {
+            addtaskpane.setVisible(true);
+            addtaskpane.setItems(FXCollections.observableArrayList(new ArrayList<>(Collections.singletonList(new MyTask(
+                    new User(" cuoco ", false, false, false, false), new Shift(0, 0), " compito "))) ) );
+            addTaskbtn.setText("salva");
+        } else if(addTaskbtn.getText().equals("salva")){
+            User user = new User(add_cook_col.getCellData(0).toString(), true, false, false, false);
+            Shift shift = new Shift(Integer.parseInt(add_shift_col.getCellData(0).toString().split(" - ")[0]) ,
+                                        Integer.parseInt(add_shift_col.getCellData(0).toString().split(" - ")[1]) );
+            String task = add_task_col.getCellData(0);
+            MyTask t = controller.addTask(user, shift, task);
+            addtaskpane.setVisible(false);
+            addtaskpane.getItems().clear();
+            addTaskbtn.setText("+");
+            taskTab.getItems().add(t);//raw update view
+            //update by file??
+        }
     }
 
     public void buttonActionRemoveMenuIt(ActionEvent e) {
         System.out.println("rmv R");
+        MyMenuItem s = menuInfoTab.getSelectionModel().selectedItemProperty().getValue();
+        System.out.print(" elemento selez : '"+s.toString()+"'");
+        MyMenuItem  mi = controller.removeRecipe(s);
+        System.out.print("\nelemento ritornato : '"+mi.toString()+"'");
+        menuInfoTab.getItems().remove(mi); //raw update view    non va
+        //update by file?
     }
 
-    public void selectMouseClick(MouseEvent e){
+    /*public void selectMouseClick(MouseEvent e){ //per ora non lo invoca
         System.out.print("select click :");
+
         int temp = eventmenu.getItems().indexOf(e.getTarget());
         System.out.println(eventmenu.getItems().get(temp));
-    }
+        //da finire
+        /*
+        * get selected item
+        * show/update eventInfoTab
+        * *
+    }*/
 
     /*public void onMouseClick(MouseEvent e) {
         int s = e.getPickResult().toString().indexOf("text=\"");
@@ -145,23 +199,67 @@ public class GUIController extends AbstractController implements Initializable {
 
     public void buttonActionRemoveTask(ActionEvent e) {
         System.out.println("rmv compito");
+        MyTask task = taskTab.getSelectionModel().selectedItemProperty().getValue();
+        controller.removeTask(task);
+        taskTab.getItems().remove(task); //update view
     }
 
-    public void buttonActionOpenTaskTable(ActionEvent e) {
+    public void buttonActionOpenTaskTable(ActionEvent e) throws Exception {
         System.out.println("tabellone turni");
+        controller.openTaskTable();
     }
 
-    public void listEvent(ContextMenuEvent e) {
-        System.out.println("list event");
+    public void buttonActionAddNote(ActionEvent e) {
+        System.out.println("note/save pressed");
+        if(addnotebtn.getText().equals("Note")) {
+            System.out.println("add note");
+            addnotetab.setVisible(true);
+            addnotebtn.setText("Salva");
+        } else if(addnotebtn.getText().equals("Salva")){
+            System.out.println("save note");
+            addnotetab.setVisible(false);
+            addnotebtn.setText("Note");
+            //File f = new File("data/"+eventmenu.getText());//o nel controller
+            controller.writeNotesEventFile(addnotetab.getText());
+            addnotetab.clear();
+            eventInfoTab.setText(controller.readEventFile(new File("data/"+eventmenu.getText())) ); //update view
+        }
     }
 
-    public void buttonActionNewEvent(ActionEvent e) {
-        System.out.println("new event");
-        eventInfoTab.clear();
-        eventInfoTab.setEditable(true);
+    public void updateMenu(){//update view      ??con binding forse non serve
+        /* prende info dalla tab menu e aggiorna il file (per l'ordine)*/
+        System.out.println("CONTROLLO : menu file '"+eventmenu.getText()+"'");
+        File menuFile = new File("data/"+eventmenu.getText()+"/menu.dat");
+        ObservableList<MyMenuItem> menuList = menuInfoTab.getItems();
+        System.out.println("CONTROLLO : lista {\n"+menuList+"\n\n}");
 
-        //menuInfoTab. clear()
-        //taskTab. clear()
+        controller.updateFile(menuFile, menuList);
+    }
+
+    private void initializeMenuButtonHandler(){
+        AtomicReference<File> f = new AtomicReference<>();
+        AtomicReference<File> dir = new AtomicReference<>();
+        EventHandler<ActionEvent> myHandl = h -> { if ( ((MenuItem)h.getSource()).getText().contains(".txt") || ((MenuItem)h.getSource()).getText().contains(".dat") ) {
+                                                        f.set(new File("data/"+((MenuItem) h.getSource()).getText()));
+                                                        System.out.println(f.get().getPath() + " selected in if");
+                                                        menuInfoTab.getItems().clear();
+                                                        taskTab.getItems().clear();
+                                                        controller.setCurrentEvent(f.get());
+                                                        dir.set(f.get());
+                                                    }else {
+                                                            dir.set(new File("data/" + ((MenuItem) h.getSource()).getText()));
+                                                            f.set(new File(dir.get().getPath() + "/info.dat"));
+                                                            System.out.println(f.get().getPath() + " selected in else");
+                                                            menuInfoTab.setItems(FXCollections.observableArrayList(controller.readMenuFile(dir.get())));
+                                                            //menuInfoTab.itemsProperty().bind((ObservableListValue)FXCollections.observableArrayList(controller.readMenuFile(dir)) ); //???
+                                                            taskTab.setItems(FXCollections.observableArrayList(controller.readTaskFile(dir.get())));
+                                                            controller.setCurrentEvent(dir.get());
+                                                    }
+                                                   eventInfoTab.setText(controller.readEventFile(dir.get()) );
+
+                                                   eventmenu.setText(dir.get().getPath().substring(5));
+                                                };
+        eventmenu.getItems().forEach(item -> item.setOnAction(myHandl));
     }
 
 
@@ -169,47 +267,90 @@ public class GUIController extends AbstractController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         System.out.println("init..");
 
-        eventmenu.getItems().addAll(controller.getNEvents());
-
-        File eventFile = new File("data/event1/event-info.txt");//controller.getPath("event")
+        File eventFile = new File("data/event1/event-info.dat");
+        controller.setCurrentEvent(eventFile);
+        eventmenu.setText(eventFile.getPath().substring(5));
+        /* MOVED to controller
         if(!eventFile.exists()){
-            controller.initEventFile(eventFile); //da spostare nel model + rimbalzo controller prima
-        }
-        File menuFile = new File("data/event1/menu.txt");//controller.getPath("menu")
-        File taskFile = new File("data/event1/task.dat");//controller.getPath("task")
+            controller.initEventFile(eventFile);
+        }*/
+        //File menuFile = new File("data/event1/menu.dat");//controller.getPath("menu")
+        //File taskFile = new File("data/event1/task.dat");//controller.getPath("task")
 
-        eventInfoTab.setText(controller.readEventFile(eventFile)); //da spostare nel model + rimbalzo controller prima
+        eventmenu.getItems().addAll(controller.getNEvents());
+        initializeMenuButtonHandler();
 
-        User aldo = new User("Aldo", true/*cook*/, false/*chef*/, false/*org*/, false/*srv*/);
-        Shift s1 = new Shift(9, 12);
-        Shift s2 = new Shift(12, 15);
-        Recipe r = new Recipe("pasta", new User("Ciccio", true/*cook*/, false/*chef*/, false/*org*/, false/*srv*/), "far bollire l'acqua, salare ecc..");
-        Recipe b = new Recipe("bistecca", new User("Carlo", true/*cook*/, false/*chef*/, false/*org*/, false/*srv*/), "scaldare la padella, sciogliere una noce di burro ecc..");
+        eventInfoTab.setText(controller.readEventFile(eventFile));
+
+        //User aldo = new User("Aldo", true/*cook*/, false/*chef*/, false/*org*/, false/*srv*/);
+        //Shift s1 = new Shift(9, 12);
+        //Shift s2 = new Shift(12, 15);
+        //Recipe r = new Recipe("pasta", new User("Ciccio", true/*cook*/, false/*chef*/, false/*org*/, false/*srv*/), "far bollire l'acqua, salare ecc..");
+        //Recipe b = new Recipe("bistecca", new User("Carlo", true/*cook*/, false/*chef*/, false/*org*/, false/*srv*/), "scaldare la padella, sciogliere una noce di burro ecc..");
         //MyMenuItem mi = new MyMenuItem(r, 50);
-        ArrayList<MyTask> taskList = new ArrayList<>();//data/event1/task.dat
-        taskList.add(new MyTask(aldo, s1, r, 50));
-        taskList.add(new MyTask(aldo, s2, b, 20));
+        //ArrayList<MyTask> taskList = new ArrayList<>();//data/event1/task.dat
+        //taskList.add(new MyTask(aldo, s1, r, 50));
+        //taskList.add(new MyTask(aldo, s2, b, 20));
         /*for(MyTask a : taskList){
             System.out.println(a.toString());
         }*/
-        ObservableList<MyTask> obsTask = FXCollections.observableArrayList(taskList);
+        //ObservableList<MyTask> obsTask = FXCollections.observableArrayList(taskList);
 
         col_cook.setCellValueFactory(new PropertyValueFactory<>("cook"));
         col_shift.setCellValueFactory(new PropertyValueFactory<>("shift"));
         col_task.setCellValueFactory(new PropertyValueFactory<>("task"));
-        taskTab.setItems(obsTask);
+        //taskTab.setItems(obsTask);
 
-        ArrayList<String> menuList = new ArrayList<>();//data/event1/menu.txt
-        menuList.add(new MyMenuItem(r, 20).toString());
-        menuList.add(new MyMenuItem(b, 20).toString());
+        add_cook_col.setCellValueFactory(new PropertyValueFactory<>("cook"));
+        add_cook_col.setCellFactory(TextFieldTableCell.<MyTask, User>forTableColumn(new StringConverter<User>() {
+            @Override
+            public String toString(User user) {
+                return user.toString();
+            }
+
+            @Override
+            public User fromString(String s) {
+                return new User(s, false,false,false,false);
+            }
+        }));
+        add_cook_col.setOnEditCommit(
+                t -> ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) ).
+                        setCook(t.getNewValue())
+        );
+        add_shift_col.setCellValueFactory(new PropertyValueFactory<>("shift"));
+        add_shift_col.setCellFactory(TextFieldTableCell.<MyTask, Shift>forTableColumn(new StringConverter<Shift>() {
+            @Override
+            public String toString(Shift shift) {
+                return shift.toString();
+            }
+
+            @Override
+            public Shift fromString(String s) {
+                return new Shift(Integer.parseInt(s.split(" - ")[0]) , Integer.parseInt(s.split(" - ")[1]) );
+            }
+        }));
+        add_shift_col.setOnEditCommit(
+                t -> ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) ).
+                        setShift(t.getNewValue())
+        );
+        add_task_col.setCellValueFactory(new PropertyValueFactory<>("task"));
+        add_task_col.setCellFactory(TextFieldTableCell.<MyTask>forTableColumn());
+        add_task_col.setOnEditCommit(
+                t -> ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) ).
+                        setTask(t.getNewValue())
+        );
+
+        //ArrayList<String> menuList = new ArrayList<>();//data/event1/menu.txt
+        //menuList.add(new MyMenuItem(r, 20).toString());
+        //menuList.add(new MyMenuItem(b, 20).toString());
         /*for(String a : menuList){
             System.out.println("list : "+a);
         }*/
-        ObservableList<String> obsMenu = FXCollections.observableArrayList(menuList);
+        //ObservableList<String> obsMenu = FXCollections.observableArrayList(menuList);
         //DataFormat df = new DataFormat("MyMenuItem");
         //System.out.println("dataf : "+df);
-        menuInfoTab.setCellFactory(param -> new MenuCell());
-        menuInfoTab.setItems(obsMenu);
+        menuInfoTab.setCellFactory(param -> new MenuCell(this));
+        //menuInfoTab.setItems(obsMenu);
     }
 
 }
