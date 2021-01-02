@@ -1,3 +1,5 @@
+import javafx.beans.value.ObservableListValue;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -39,6 +41,8 @@ public class GUIController extends AbstractController implements Initializable {
     @FXML
     private TableColumn<MyTask, Shift> col_shift;
     @FXML
+    private TableColumn<MyTask, String> col_day;
+    @FXML
     private TableColumn<MyTask, String> col_task;
     @FXML
     private Button addTaskbtn;
@@ -64,6 +68,8 @@ public class GUIController extends AbstractController implements Initializable {
     private TableColumn<MyTask, User> add_cook_col;
     @FXML
     private TableColumn<MyTask, Shift> add_shift_col;
+    @FXML
+    private TableColumn<MyTask, String> add_day_col;
     @FXML
     private TableColumn<MyTask, String> add_task_col;
 
@@ -121,14 +127,15 @@ public class GUIController extends AbstractController implements Initializable {
         if(addTaskbtn.getText().equals("+")) {
             addtaskpane.setVisible(true);
             addtaskpane.setItems(FXCollections.observableArrayList(new ArrayList<>(Collections.singletonList(new MyTask(
-                    new User(" cuoco ", false, false, false, false), new Shift(0, 0), " compito "))) ) );
+                    new User("cuoco", false, false, false, false), new Shift(0, 0), "2000-01-01", "compito"))) ) );
             addTaskbtn.setText("salva");
         } else if(addTaskbtn.getText().equals("salva")){
             User user = new User(add_cook_col.getCellData(0).toString(), true, false, false, false);
-            Shift shift = new Shift(Integer.parseInt(add_shift_col.getCellData(0).toString().split(" - ")[0]) ,
-                                        Integer.parseInt(add_shift_col.getCellData(0).toString().split(" - ")[1]) );
+            Shift shift = new Shift(Integer.parseInt(add_shift_col.getCellData(0).toString().split("-")[0].strip()) ,
+                                        Integer.parseInt(add_shift_col.getCellData(0).toString().split("-")[1].strip()) );
+            String day = add_day_col.getCellData(0);
             String task = add_task_col.getCellData(0);
-            MyTask t = controller.addTask(user, shift, task);
+            MyTask t = controller.addTask(user, shift, day, task);
             addtaskpane.setVisible(false);
             addtaskpane.getItems().clear();
             addTaskbtn.setText("+");
@@ -250,9 +257,12 @@ public class GUIController extends AbstractController implements Initializable {
                                                             dir.set(new File("data/" + ((MenuItem) h.getSource()).getText()));
                                                             f.set(new File(dir.get().getPath() + "/info.dat"));
                                                             System.out.println(f.get().getPath() + " selected in else");
-                                                            menuInfoTab.setItems(FXCollections.observableArrayList(controller.readMenuFile(dir.get())));
-                                                            //menuInfoTab.itemsProperty().bind((ObservableListValue)FXCollections.observableArrayList(controller.readMenuFile(dir)) ); //???
-                                                            taskTab.setItems(FXCollections.observableArrayList(controller.readTaskFile(dir.get())));
+                                                            menuInfoTab.getItems().clear();
+                                                            menuInfoTab.setItems(FXCollections.observableArrayList(controller.readMenuFile(dir.get())));//funziona, ma non bindata
+                                                            //bind???
+                                                            //System.out.println("CONTROLLO: item menu: '"+menuInfoTab.getItems().size()+"'");
+                                                            taskTab.setItems(FXCollections.observableArrayList(controller.readTaskFile(dir.get())));//funziona, ma non bindata
+                                                            //bind???
                                                             controller.setCurrentEvent(dir.get());
                                                     }
                                                    eventInfoTab.setText(controller.readEventFile(dir.get()) );
@@ -282,25 +292,14 @@ public class GUIController extends AbstractController implements Initializable {
 
         eventInfoTab.setText(controller.readEventFile(eventFile));
 
-        //User aldo = new User("Aldo", true/*cook*/, false/*chef*/, false/*org*/, false/*srv*/);
-        //Shift s1 = new Shift(9, 12);
-        //Shift s2 = new Shift(12, 15);
-        //Recipe r = new Recipe("pasta", new User("Ciccio", true/*cook*/, false/*chef*/, false/*org*/, false/*srv*/), "far bollire l'acqua, salare ecc..");
-        //Recipe b = new Recipe("bistecca", new User("Carlo", true/*cook*/, false/*chef*/, false/*org*/, false/*srv*/), "scaldare la padella, sciogliere una noce di burro ecc..");
-        //MyMenuItem mi = new MyMenuItem(r, 50);
-        //ArrayList<MyTask> taskList = new ArrayList<>();//data/event1/task.dat
-        //taskList.add(new MyTask(aldo, s1, r, 50));
-        //taskList.add(new MyTask(aldo, s2, b, 20));
-        /*for(MyTask a : taskList){
-            System.out.println(a.toString());
-        }*/
-        //ObservableList<MyTask> obsTask = FXCollections.observableArrayList(taskList);
-
+        /*Taskpane*/
         col_cook.setCellValueFactory(new PropertyValueFactory<>("cook"));
         col_shift.setCellValueFactory(new PropertyValueFactory<>("shift"));
+        col_day.setCellValueFactory(new PropertyValueFactory<>("date"));
         col_task.setCellValueFactory(new PropertyValueFactory<>("task"));
         //taskTab.setItems(obsTask);
 
+        /*add new task*/
         add_cook_col.setCellValueFactory(new PropertyValueFactory<>("cook"));
         add_cook_col.setCellFactory(TextFieldTableCell.<MyTask, User>forTableColumn(new StringConverter<User>() {
             @Override
@@ -326,12 +325,18 @@ public class GUIController extends AbstractController implements Initializable {
 
             @Override
             public Shift fromString(String s) {
-                return new Shift(Integer.parseInt(s.split(" - ")[0]) , Integer.parseInt(s.split(" - ")[1]) );
+                return new Shift(Integer.parseInt(s.split("-")[0].strip()) , Integer.parseInt(s.split("-")[1].strip()));
             }
         }));
         add_shift_col.setOnEditCommit(
                 t -> ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) ).
                         setShift(t.getNewValue())
+        );
+        add_day_col.setCellValueFactory(new PropertyValueFactory<>("date"));
+        add_day_col.setCellFactory(TextFieldTableCell.<MyTask>forTableColumn());
+        add_day_col.setOnEditCommit(
+                t -> ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) ).
+                        setDate(t.getNewValue())
         );
         add_task_col.setCellValueFactory(new PropertyValueFactory<>("task"));
         add_task_col.setCellFactory(TextFieldTableCell.<MyTask>forTableColumn());

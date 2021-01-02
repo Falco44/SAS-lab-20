@@ -162,6 +162,7 @@ public class Model {
             e.printStackTrace();
         }
         //ret = (ObservableListValue<MyMenuItem>) FXCollections.observableArrayList(al);
+        //System.out.println("CONTROLLO: elementi letti : '"+ret.size()+"'");
         return ret;
     }
 
@@ -220,8 +221,8 @@ public class Model {
         User carlo = new User("Carlo", true/*cook*/, false/*chef*/, false/*org*/, false/*srv*/);
         Recipe r = new Recipe("pasta", ciccio, "far bollire l'acqua, salare ecc..");
         Recipe b = new Recipe("bistecca", carlo, "scaldare la padella, sciogliere una noce di burro ecc..");
-        al.add(new MyTask(ciccio, s1, r, 10));
-        al.add(new MyTask(carlo, s2, b, 5));
+        al.add(new MyTask(ciccio, s1, "2020-12-24", r, 10));
+        al.add(new MyTask(carlo, s2, "2020-12-24", b, 5));
 
         try (ObjectOutputStream ins = new ObjectOutputStream(new FileOutputStream(f))) {
             for(MyTask mt : al){
@@ -343,10 +344,10 @@ public class Model {
         System.out.println("DONE");
     }
 
-    public MyTask addTask(File f, User user, Shift shift, String task) {
+    public MyTask addTask(File f, User user, Shift shift, String date, String task) {
         System.out.print("updating task file...");
         ArrayList<MyTask> tlist = new ArrayList<>();
-        MyTask t = new MyTask(user, shift, task);
+        MyTask t = new MyTask(user, shift, date, task);
         try (ObjectInputStream taskOIS = new ObjectInputStream(new FileInputStream(f))) {
             while (true)
                 tlist.add((MyTask) taskOIS.readObject());

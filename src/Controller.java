@@ -79,7 +79,7 @@ public class Controller extends AbstractController{
     public void openRecipeBook() throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("guiRecipeBook.fxml"));
         RecipeBookController rbc = new RecipeBookController(this);
-        loader.setController(rbc);
+        /*loader.setController(rbc);
         Parent layout;
         //try {
             layout = loader.load();
@@ -93,10 +93,26 @@ public class Controller extends AbstractController{
             popupStage.initModality(Modality.WINDOW_MODAL);
             popupStage.setTitle("Recipe Book");
             popupStage.setScene(scene);
-            popupStage.showAndWait();
-        /*} catch (IOException e) {
-            e.printStackTrace();
-        }*/
+            popupStage.showAndWait();*/
+        newWindow(loader, rbc, "Recipe Book");
+    }
+
+    private void newWindow (FXMLLoader load, AbstractController c, String title) throws Exception {
+        load.setController(c);
+        Parent layout;
+        layout = load.load();
+        Scene scene = new Scene(layout);
+        // this is the popup stage
+        Stage popupStage = new Stage();
+        // Giving the popup controller access to the popup stage (to allow the controller to close the stage)
+        //assert c.getClass() == RecipeBookController.class || c.getClass() == TaskTableController.class;
+        //c.setStage(popupStage);//?
+        if (this.main != null)
+            popupStage.initOwner(main.getPrimaryStage());
+        popupStage.initModality(Modality.WINDOW_MODAL);
+        popupStage.setTitle(title);
+        popupStage.setScene(scene);
+        popupStage.showAndWait();
     }
 
     public ArrayList<Recipe> readBook(ObjectInputStream ins){
@@ -155,15 +171,15 @@ public class Controller extends AbstractController{
         return model.editMI(f, item, s);
     }
 
-    public MyTask addTask(User user, Shift shift, String task) {
+    public MyTask addTask(User user, Shift shift, String day, String task) {
         File f = new File(currentEvent.getPath()+"/task.dat");
-        return model.addTask(f, user, shift, task);
+        return model.addTask(f, user, shift, day, task);
     }
 
     public void openTaskTable() throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("guiTaskTable.fxml"));
         TaskTableController ttc = new TaskTableController(this);
-        loader.setController(ttc);
+        /*loader.setController(ttc);
         Parent layout;
         layout = loader.load();
         Scene scene = new Scene(layout);
@@ -176,6 +192,7 @@ public class Controller extends AbstractController{
         popupStage.initModality(Modality.WINDOW_MODAL);
         popupStage.setTitle("General Task Table");
         popupStage.setScene(scene);
-        popupStage.showAndWait();
+        popupStage.showAndWait();*/
+        newWindow(loader, ttc, "General Task Table");
     }
 }

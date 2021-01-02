@@ -12,7 +12,8 @@
         <columns>
           <TableColumn fx:id="col_cook" prefWidth="135.0" text="Cuoco" />
           <TableColumn fx:id="col_shift" prefWidth="70.0" text="Turno" />
-            <TableColumn fx:id="col_task" prefWidth="285.0" text="Compito" />
+          <TableColumn fx:id="col_day" prefWidth="118.0" text="Giorno" />
+          <TableColumn fx:id="col_task" prefWidth="237.0" text="Compito" />
         </columns>
       </TableView>
       <Button fx:id="addTaskbtn" layoutX="75.0" layoutY="226.0" mnemonicParsing="false" onAction="#buttonActionAddTask" text="+" AnchorPane.leftAnchor="75.0" AnchorPane.topAnchor="226.0" />
@@ -36,7 +37,8 @@
         <columns>
           <TableColumn fx:id="add_cook_col" prefWidth="102.0" sortable="false" text="Cuoco" />
           <TableColumn fx:id="add_shift_col" prefWidth="60.0" sortable="false" text="Turno" />
-            <TableColumn fx:id="add_task_col" prefWidth="243.0" sortable="false" text="Compito" />
+            <TableColumn fx:id="add_day_col" prefWidth="92.0" sortable="false" text="Giorno" />
+            <TableColumn fx:id="add_task_col" prefWidth="155.0" sortable="false" text="Compito" />
         </columns>
       </TableView>
    </children>

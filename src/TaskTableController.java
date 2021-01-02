@@ -17,7 +17,6 @@ public class TaskTableController extends AbstractController implements Initializ
 
     private Stage stage;
     private ArrayList<File> taskFile = new ArrayList<>();
-    private String move;
     private final Controller contr;
 
     @FXML
@@ -26,6 +25,8 @@ public class TaskTableController extends AbstractController implements Initializ
     private TableColumn<Recipe, String> cook_col;
     @FXML
     private TableColumn<Recipe, String> shift_col;
+    @FXML
+    private TableColumn<Recipe, String> date_col;
     @FXML
     private TableColumn<Recipe, String> task_col;
 
@@ -38,6 +39,7 @@ public class TaskTableController extends AbstractController implements Initializ
         System.out.println("init popup...");
         cook_col.setCellValueFactory(new PropertyValueFactory<>("cook"));
         shift_col.setCellValueFactory(new PropertyValueFactory<>("shift"));
+        date_col.setCellValueFactory(new PropertyValueFactory<>("date"));
         task_col.setCellValueFactory(new PropertyValueFactory<>("task"));
 
         try {
@@ -58,7 +60,7 @@ public class TaskTableController extends AbstractController implements Initializ
                                 System.out.println("CONTROLLO file : " + srv.listFiles()[k]);
                                 if (srv.listFiles()[k].getName().contains("task.dat")) {
                                     taskFile.add(new File(srv.getPath()));
-                                    System.out.println("add");
+                                    //System.out.println("add");
                                 }
                             }
                         }
