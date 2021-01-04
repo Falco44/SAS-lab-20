@@ -6,7 +6,7 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="800.0" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <TextArea id="eventotab" fx:id="eventInfoTab" editable="false" layoutY="32.0" minHeight="170.0" minWidth="200.0" prefHeight="170.0" prefWidth="309.0" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="30.0" />
-      <Button fx:id="menuBtn" layoutX="348.0" layoutY="14.0" mnemonicParsing="false" onAction="#buttonActionRecipeBook" text="Menu" AnchorPane.topAnchor="14.0" />
+      <Button fx:id="menuBtn" layoutX="337.0" layoutY="14.0" mnemonicParsing="false" onAction="#buttonActionRecipeBook" text="Ricettario" AnchorPane.topAnchor="14.0" />
       <Button fx:id="editMIbtn" layoutX="339.0" layoutY="50.0" mnemonicParsing="false" onAction="#buttonActionEditMenuItem" text="Modifica" AnchorPane.topAnchor="50.0" />
       <TableView fx:id="taskTab" editable="true" layoutX="113.0" layoutY="229.0" minHeight="200.0" minWidth="490.0" prefHeight="200.0" prefWidth="637.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
         <columns>

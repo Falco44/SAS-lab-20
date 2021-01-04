@@ -6,7 +6,7 @@ import javafx.scene.input.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MenuCell extends ListCell<MyMenuItem> {
     private final GUIController controller;
@@ -14,6 +14,7 @@ public class MenuCell extends ListCell<MyMenuItem> {
 
     public MenuCell(GUIController c) {
         this.controller = c;
+        ArrayList<MyMenuItem> dragged = new ArrayList<>();
         //ListCell thisCell = this;
 
         setContentDisplay(ContentDisplay.TEXT_ONLY);
@@ -28,10 +29,11 @@ public class MenuCell extends ListCell<MyMenuItem> {
 
             Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
+            dragged.add(getItem());
 
 
-            System.out.println("CONTROLLO CELL : '"+ getItem().getClass() +"'");
-            content.put(DataFormat.lookupMimeType("text"), getItem());//.putString(getItem());
+            System.out.println("CONTROLLO CELL : '"+ getItem().getClass() +"'"+ " elem in content:"+content.size()+"\t dragged:"+ dragged.get(0).toString());
+            content.put(DataFormat.PLAIN_TEXT, getItem());//.putString(getItem());
             /*dragboard.setDragView(
                     birdImages.get(
                             items.indexOf(
@@ -39,6 +41,7 @@ public class MenuCell extends ListCell<MyMenuItem> {
                             )
                     )
             );*/
+            System.out.println("CONTROLLO CELL: content nelem:"+content.size()+"\t =["+content.toString()+"\n] dragged:"+ dragged.get(0).toString());
             dragboard.setContent(content);
 
             event.consume();
@@ -71,35 +74,42 @@ public class MenuCell extends ListCell<MyMenuItem> {
             if (getItem() == null) {
                 return;
             }
+            System.out.println("CONTROLLO CELL: new dragged:"+ dragged.get(0).toString());
 
             //Dragboard db = event.getDragboard();
-            MyMenuItem db = (MyMenuItem) event.getSource();
-            boolean success = false;
+            //MyMenuItem db = (MyMenuItem) event.getSource();
+            //MyMenuItem db = (MyMenuItem) event.getDragboard().getContent(DataFormat.PLAIN_TEXT);
+            //boolean success = false;
 
             //if (db.hasString()) {
                 ObservableList<MyMenuItem> items = getListView().getItems();
+            System.out.println("CONTROLLO CELL: dragged: '"+ dragged.get(0).toString()+"'");
 
-                int draggedIdx = items.indexOf(db);
-                //System.out.print("CONTROLLO: dradded idx"+draggedIdx);
+                int draggedIdx = -1;
+                for(MyMenuItem mi : items) {
+                    if (mi.toString().equals(dragged.get(0).toString()))
+                        draggedIdx = items.indexOf(mi);
+                }
+                System.out.print("CONTROLLO CELL: dragged idx"+draggedIdx);
                 int thisIdx = items.indexOf(this.getItem());
-                //System.out.print(" CONTROLLO: dradded idx"+thisIdx);
+                System.out.println(" CONTROLLO CELL: dropped idx"+thisIdx);
 
                 /*Image temp = birdImages.get(draggedIdx);
                 birdImages.set(draggedIdx, birdImages.get(thisIdx));
                 birdImages.set(thisIdx, temp);*/
 
                 items.set(draggedIdx, this.getItem());
-                items.set(thisIdx, db);//.getString()
+                items.set(thisIdx, dragged.get(0));//.getString()
 
                 List<MyMenuItem> itemscopy = new ArrayList<>(getListView().getItems());
                 getListView().getItems().setAll(itemscopy);
 
-                success = true;
+                //success = true;
             //}
-            event.setDropCompleted(success);
+            event.setDropCompleted(true);//success
 
             event.consume();
-            controller.updateMenu();
+            //controller.updateMenu();
         });
 
         setOnDragDone(DragEvent::consume);

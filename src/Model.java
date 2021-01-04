@@ -233,7 +233,7 @@ public class Model {
         }
     }
 
-    public MyMenuItem removeRecipe(MyMenuItem mi, File f) { //controllare il tipo all'interno del file
+    public void /*MyMenuItem*/ removeRecipe(MyMenuItem mi, File f) { //controllare il tipo all'interno del file
         ArrayList<MyMenuItem> mlist = new ArrayList<>();
         int idx = 0;
         MyMenuItem ret = null;
@@ -258,18 +258,20 @@ public class Model {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return ret;
+        //return ret;
     }
 
     public MyMenuItem editMI(File f, MyMenuItem item, String s){
         ArrayList<MyMenuItem> mlist = new ArrayList<>();
         int idx = 0;
         MyMenuItem ret = null;
+        System.out.print("MODEL: editMI...");
 
         try(ObjectInputStream ins = new ObjectInputStream(new FileInputStream(f))) {
             while (true)
                 mlist.add((MyMenuItem) ins.readObject());
         }catch (EOFException eof){
+            System.out.println("CONTROLLO: lista prima: "+mlist.toString());
             for(MyMenuItem m : mlist){
                 if(m.toString().equals(item.toString()))
                     idx = mlist.indexOf(m);
@@ -278,7 +280,7 @@ public class Model {
             ret.setQty(Integer.parseInt(s));
             mlist.remove(idx);
             mlist.add(idx, ret);
-            try(ObjectOutputStream outs = new ObjectOutputStream(new FileOutputStream(f))){
+            try(ObjectOutputStream outs = new ObjectOutputStream(new FileOutputStream(f, false))){
                 for (MyMenuItem m : mlist)
                     outs.writeObject(m);
             } catch (IOException e) {
@@ -287,6 +289,8 @@ public class Model {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+        System.out.println("CONTROLLO: lista dopo: "+mlist.toString());
+        System.out.println("DONE");
         return ret;
     }
 
@@ -365,5 +369,12 @@ public class Model {
             e.printStackTrace();
         }
         return t;
+    }
+
+    public void modTask(File f, MyTask task){
+        //System.out.println("MODEL: task");
+        addTask(f, task.getCook(), task.getShift(), task.getDate(), task.getTask());
+        //removeTask(task, f);
+
     }
 }

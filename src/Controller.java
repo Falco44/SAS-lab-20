@@ -152,9 +152,9 @@ public class Controller extends AbstractController{
         this.currentEvent = f;
     }
 
-    public MyMenuItem removeRecipe(MyMenuItem s) {
+    public void /*MyMenuItem*/ removeRecipe(MyMenuItem s) {
         File f = new File(currentEvent.getPath()+"/menu.dat");
-        return model.removeRecipe(s, f);
+        /*return*/ model.removeRecipe(s, f);
     }
 
     public void removeTask(MyTask task) {
@@ -174,6 +174,11 @@ public class Controller extends AbstractController{
     public MyTask addTask(User user, Shift shift, String day, String task) {
         File f = new File(currentEvent.getPath()+"/task.dat");
         return model.addTask(f, user, shift, day, task);
+    }
+
+    public void modTask(MyTask task) {
+        File f = new File(currentEvent.getPath()+"/task.dat");
+        model.modTask(f, task);
     }
 
     public void openTaskTable() throws Exception {

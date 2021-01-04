@@ -1,3 +1,4 @@
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ObservableListValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -111,7 +112,7 @@ public class GUIController extends AbstractController implements Initializable {
         } else if (editMIbtn.getText().equals("Salva")){
             MyMenuItem item = menuInfoTab.getSelectionModel().selectedItemProperty().getValue();
             String s = editMI.getText();
-            MyMenuItem mi = controller.editMI(item, s);
+            MyMenuItem mi = controller.editMI(item, s);//editMI non serve che ritorni
             int i = menuInfoTab.getItems().indexOf(item);
             menuInfoTab.getItems().remove(item); //raw update view
             menuInfoTab.getItems().add(i, mi); //raw update view
@@ -147,10 +148,11 @@ public class GUIController extends AbstractController implements Initializable {
     public void buttonActionRemoveMenuIt(ActionEvent e) {
         System.out.println("rmv R");
         MyMenuItem s = menuInfoTab.getSelectionModel().selectedItemProperty().getValue();
-        System.out.print(" elemento selez : '"+s.toString()+"'");
-        MyMenuItem  mi = controller.removeRecipe(s);
-        System.out.print("\nelemento ritornato : '"+mi.toString()+"'");
-        menuInfoTab.getItems().remove(mi); //raw update view    non va
+        //System.out.print(" elemento selez : '"+s.toString()+"'");
+        /*MyMenuItem  mi =*/ controller.removeRecipe(s);
+        //System.out.print("\nelemento ritornato : '"+mi.toString()+"'");
+        //System.out.println("CONTROLLO: c'e' mi?"+menuInfoTab.getItems().contains(mi) +"\t s?"+menuInfoTab.getItems().contains(s));
+        menuInfoTab.getItems().remove(s); //raw update view    mi non serve
         //update by file?
     }
 
@@ -229,19 +231,19 @@ public class GUIController extends AbstractController implements Initializable {
             //File f = new File("data/"+eventmenu.getText());//o nel controller
             controller.writeNotesEventFile(addnotetab.getText());
             addnotetab.clear();
-            eventInfoTab.setText(controller.readEventFile(new File("data/"+eventmenu.getText())) ); //update view
+            eventInfoTab.setText(controller.readEventFile(new File("data/"+eventmenu.getText())) ); //raw update view
         }
     }
 
-    public void updateMenu(){//update view      ??con binding forse non serve
+    //public void updateMenu(){//update view      ??con binding forse non serve
         /* prende info dalla tab menu e aggiorna il file (per l'ordine)*/
-        System.out.println("CONTROLLO : menu file '"+eventmenu.getText()+"'");
+        /*System.out.println("CONTROLLO : menu file '"+eventmenu.getText()+"'");
         File menuFile = new File("data/"+eventmenu.getText()+"/menu.dat");
         ObservableList<MyMenuItem> menuList = menuInfoTab.getItems();
         System.out.println("CONTROLLO : lista {\n"+menuList+"\n\n}");
 
         controller.updateFile(menuFile, menuList);
-    }
+    }*/
 
     private void initializeMenuButtonHandler(){
         AtomicReference<File> f = new AtomicReference<>();
@@ -257,12 +259,13 @@ public class GUIController extends AbstractController implements Initializable {
                                                             dir.set(new File("data/" + ((MenuItem) h.getSource()).getText()));
                                                             f.set(new File(dir.get().getPath() + "/info.dat"));
                                                             System.out.println(f.get().getPath() + " selected in else");
+
                                                             menuInfoTab.getItems().clear();
-                                                            menuInfoTab.setItems(FXCollections.observableArrayList(controller.readMenuFile(dir.get())));//funziona, ma non bindata
-                                                            //bind???
-                                                            //System.out.println("CONTROLLO: item menu: '"+menuInfoTab.getItems().size()+"'");
-                                                            taskTab.setItems(FXCollections.observableArrayList(controller.readTaskFile(dir.get())));//funziona, ma non bindata
-                                                            //bind???
+                                                            System.out.println("CONTROLLO: el in menutab prima:"+menuInfoTab.getItems().size());
+                                                            menuInfoTab.setItems(FXCollections.observableArrayList(controller.readMenuFile(dir.get())));
+                                                            System.out.println("CONTROLLO: el in menutab dopo:"+menuInfoTab.getItems().size());
+
+                                                            taskTab.setItems(FXCollections.observableArrayList(controller.readTaskFile(dir.get())));
                                                             controller.setCurrentEvent(dir.get());
                                                     }
                                                    eventInfoTab.setText(controller.readEventFile(dir.get()) );
@@ -293,31 +296,14 @@ public class GUIController extends AbstractController implements Initializable {
         eventInfoTab.setText(controller.readEventFile(eventFile));
 
         /*Taskpane*/
-        col_cook.setCellValueFactory(new PropertyValueFactory<>("cook"));
-        col_shift.setCellValueFactory(new PropertyValueFactory<>("shift"));
-        col_day.setCellValueFactory(new PropertyValueFactory<>("date"));
-        col_task.setCellValueFactory(new PropertyValueFactory<>("task"));
+        setCells();
+        //col_day.setCellValueFactory(new PropertyValueFactory<>("date"));
+        //col_task.setCellValueFactory(new PropertyValueFactory<>("task"));
         //taskTab.setItems(obsTask);
 
         /*add new task*/
-        add_cook_col.setCellValueFactory(new PropertyValueFactory<>("cook"));
-        add_cook_col.setCellFactory(TextFieldTableCell.<MyTask, User>forTableColumn(new StringConverter<User>() {
-            @Override
-            public String toString(User user) {
-                return user.toString();
-            }
-
-            @Override
-            public User fromString(String s) {
-                return new User(s, false,false,false,false);
-            }
-        }));
-        add_cook_col.setOnEditCommit(
-                t -> ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) ).
-                        setCook(t.getNewValue())
-        );
-        add_shift_col.setCellValueFactory(new PropertyValueFactory<>("shift"));
-        add_shift_col.setCellFactory(TextFieldTableCell.<MyTask, Shift>forTableColumn(new StringConverter<Shift>() {
+        //setCells();
+        /*add_shift_col.setCellFactory(TextFieldTableCell.<MyTask, Shift>forTableColumn(new StringConverter<Shift>() {
             @Override
             public String toString(Shift shift) {
                 return shift.toString();
@@ -343,19 +329,92 @@ public class GUIController extends AbstractController implements Initializable {
         add_task_col.setOnEditCommit(
                 t -> ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) ).
                         setTask(t.getNewValue())
-        );
+        );*/
 
-        //ArrayList<String> menuList = new ArrayList<>();//data/event1/menu.txt
-        //menuList.add(new MyMenuItem(r, 20).toString());
-        //menuList.add(new MyMenuItem(b, 20).toString());
-        /*for(String a : menuList){
-            System.out.println("list : "+a);
-        }*/
-        //ObservableList<String> obsMenu = FXCollections.observableArrayList(menuList);
-        //DataFormat df = new DataFormat("MyMenuItem");
-        //System.out.println("dataf : "+df);
+
         menuInfoTab.setCellFactory(param -> new MenuCell(this));
         //menuInfoTab.setItems(obsMenu);
+    }
+
+    private void setCells() {
+        StringConverter<User> conv_usr = new StringConverter<>() {
+            @Override
+            public String toString(User user) {
+                return user.toString();
+            }
+
+            @Override
+            public User fromString(String s) {
+                return new User(s, false, false, false, false);
+            }
+        };
+        StringConverter<Shift> conv_shift = new StringConverter<>() {
+            @Override
+            public String toString(Shift s) {
+                return s.toString();
+            }
+
+            @Override
+            public Shift fromString(String s) {
+                return new Shift(Integer.parseInt(s.split("-")[0].strip()) , Integer.parseInt(s.split("-")[1].strip()));
+            }
+        };
+
+        /*task pane*/
+        col_cook.setCellValueFactory(new PropertyValueFactory<>("cook"));
+        col_cook.setCellFactory(TextFieldTableCell.<MyTask, User>forTableColumn(conv_usr));
+        col_cook.setOnEditCommit(
+                t -> {MyTask task = ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) );
+                    controller.removeTask(task);
+                    task.setCook(t.getNewValue());
+                    controller.modTask(task);
+                });
+        col_shift.setCellValueFactory(new PropertyValueFactory<>("shift"));
+        col_shift.setCellFactory(TextFieldTableCell.<MyTask, Shift>forTableColumn(conv_shift));
+        col_shift.setOnEditCommit(
+                t -> {MyTask task = ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) );
+                    controller.removeTask(task);
+                    task.setShift(t.getNewValue());
+                    controller.modTask(task);
+                });
+        col_day.setCellValueFactory(new PropertyValueFactory<>("date"));
+        col_day.setCellFactory(TextFieldTableCell.<MyTask>forTableColumn());
+        col_day.setOnEditCommit(
+                t -> {MyTask task = ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) );
+                    controller.removeTask(task);
+                    task.setDate(t.getNewValue());
+                    controller.modTask(task);
+                });
+        col_task.setCellValueFactory(new PropertyValueFactory<>("task"));
+        col_task.setCellFactory(TextFieldTableCell.<MyTask>forTableColumn());
+        col_task.setOnEditCommit(
+                t -> {MyTask task = ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) );
+                    controller.removeTask(task);
+                    task.setTask(t.getNewValue());
+                    controller.modTask(task);
+                });
+
+        /*add task pane*/
+        add_cook_col.setCellValueFactory(new PropertyValueFactory<>("cook"));
+        add_cook_col.setCellFactory(TextFieldTableCell.<MyTask, User>forTableColumn(conv_usr));
+        add_cook_col.setOnEditCommit(
+                t -> ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) ).
+                        setCook(t.getNewValue()));
+        add_shift_col.setCellValueFactory(new PropertyValueFactory<>("shift"));
+        add_shift_col.setCellFactory(TextFieldTableCell.<MyTask, Shift>forTableColumn(conv_shift));
+        add_shift_col.setOnEditCommit(
+                t -> ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) ).
+                        setShift(t.getNewValue()));
+        add_day_col.setCellValueFactory(new PropertyValueFactory<>("date"));
+        add_day_col.setCellFactory(TextFieldTableCell.<MyTask>forTableColumn());
+        add_day_col.setOnEditCommit(
+                t -> ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) ).
+                        setDate(t.getNewValue()));
+        add_task_col.setCellValueFactory(new PropertyValueFactory<>("task"));
+        add_task_col.setCellFactory(TextFieldTableCell.<MyTask>forTableColumn());
+        add_task_col.setOnEditCommit(
+                t -> ((MyTask) t.getTableView().getItems().get(t.getTablePosition().getRow()) ).
+                        setTask(t.getNewValue()));
     }
 
 }
