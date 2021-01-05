@@ -162,8 +162,9 @@ public class Controller extends AbstractController{
         model.removeTask(task, f);
     }
 
-    public void updateFile(File menuFile, ObservableList<MyMenuItem> menuList) {
-        model.updateFile(menuFile, menuList);
+    public void updateFile(ObservableList<MyMenuItem> menuList) {
+        File f = new File(currentEvent.getPath()+"/menu.dat");
+        model.updateFile(f, menuList);
     }
 
     public MyMenuItem editMI(MyMenuItem item, String s) {

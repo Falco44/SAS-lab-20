@@ -332,7 +332,7 @@ public class GUIController extends AbstractController implements Initializable {
         );*/
 
 
-        menuInfoTab.setCellFactory(param -> new MenuCell(this));
+        menuInfoTab.setCellFactory(param -> new MenuCell2(controller));
         //menuInfoTab.setItems(obsMenu);
     }
 
